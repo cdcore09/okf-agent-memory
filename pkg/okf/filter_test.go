@@ -115,6 +115,82 @@ func TestConceptMatchesFilter(t *testing.T) {
 	}
 }
 
+func TestConceptMatchesFilterCustomListFields(t *testing.T) {
+	c := &Concept{
+		ID: "search/ranking",
+		Extra: map[string]any{
+			"topics": []any{"retrieval", "Ranking"},
+			"counts": []any{float64(1), float64(2)},
+			"repos":  []string{"contextopia", "easygov"},
+			"empty":  []any{},
+			"state":  "decided",
+		},
+	}
+
+	tests := []struct {
+		filter string
+		match  bool
+	}{
+		{"topics=retrieval", true},
+		{"topics=RETRIEVAL", true},
+		{"topics=ranking", true},
+		{"topics=indexing", false},
+		{"topics!=indexing", true},
+		{"topics!=retrieval", false},
+
+		{"counts=2", true},
+		{"counts=3", false},
+
+		{"repos=easygov", true},
+		{"repos=other", false},
+
+		{"topics=null", false},
+		{"topics!=null", true},
+		{"empty=null", true},
+		{"empty!=null", false},
+
+		{"state=decided", true},
+		{"state=open", false},
+
+		{"missing=retrieval", false},
+		{"missing!=retrieval", true},
+
+		{"topics=retrieval,state=decided", true},
+		{"topics=retrieval,state=open", false},
+	}
+
+	for _, tt := range tests {
+		got, err := c.MatchesFilter(tt.filter)
+		if err != nil {
+			t.Errorf("MatchesFilter(%q) returned unexpected error: %v", tt.filter, err)
+			continue
+		}
+		if got != tt.match {
+			t.Errorf("MatchesFilter(%q) = %v, want %v", tt.filter, got, tt.match)
+		}
+	}
+}
+
+func TestConceptMatchesFilterParsedCustomLists(t *testing.T) {
+	for name, fields := range map[string]string{
+		"flow list":  "topics: [retrieval, ranking]",
+		"block list": "topics:\n  - retrieval\n  - ranking",
+	} {
+		t.Run(name, func(t *testing.T) {
+			c, err := ParseConcept("note.md", "---\ntype: Fact\n"+fields+"\n---\n\n# Body\n")
+			if err != nil {
+				t.Fatalf("ParseConcept failed: %v", err)
+			}
+			if ok, _ := c.MatchesFilter("topics=retrieval"); !ok {
+				t.Errorf("topics=retrieval should match parsed list %#v", c.Extra["topics"])
+			}
+			if ok, _ := c.MatchesFilter("topics=indexing"); ok {
+				t.Errorf("topics=indexing must not match parsed list %#v", c.Extra["topics"])
+			}
+		})
+	}
+}
+
 func TestConceptIsStaleWithin(t *testing.T) {
 	// Base date: 2026-09-25
 	baseDate := time.Date(2026, 9, 25, 12, 0, 0, 0, time.UTC)

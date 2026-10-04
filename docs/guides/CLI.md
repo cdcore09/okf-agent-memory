@@ -90,6 +90,7 @@ okf search [query] [bundle-path] \
     * `--filter "verified.by=human"`
     * `--filter "verified.by!=null,governance=constraint"`
     * `--filter "tags=security"`
+    * `--filter "topics=retrieval"` (any list-valued field, built-in or custom, matches when it contains the value; `topics!=retrieval` matches when it does not, and `topics=null` matches an empty list)
   * `--stale-within <duration>`: Filters concepts that are already stale or will expire within relative horizon (e.g. `14d`, `2w`, `3m`).
   * `--limit <N>` (default: `10`): Maximum results to return.
   * `--json`: Outputs machine-readable JSON array of matching concepts with governance tiers and matched fields.

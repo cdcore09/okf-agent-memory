@@ -285,6 +285,9 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 		// Check extra frontmatter map
 		if c.Extra != nil {
 			if extraVal, exists := c.Extra[p.key]; exists {
+				if items, isList := extraListItems(extraVal); isList {
+					return matchList(items, p, isNullCheck)
+				}
 				strVal := fmt.Sprintf("%v", extraVal)
 				return compareString(strVal, p.operator, p.value, isNullCheck)
 			}
@@ -294,6 +297,22 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 			return p.operator == "="
 		}
 		return p.operator == "!="
+	}
+}
+
+// extraListItems returns the items of a list-valued extra frontmatter field as strings.
+func extraListItems(v any) ([]string, bool) {
+	switch list := v.(type) {
+	case []string:
+		return list, true
+	case []any:
+		items := make([]string, len(list))
+		for i, item := range list {
+			items[i] = fmt.Sprint(item)
+		}
+		return items, true
+	default:
+		return nil, false
 	}
 }
 
