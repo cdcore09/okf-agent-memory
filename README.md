@@ -27,7 +27,7 @@ Traditional approaches suffer from two fatal failure modes:
 flowchart TD
     subgraph PUSH["1. Normative Working Memory (Push Layer)"]
         direction TB
-        C1["Canonical AGENTS.md (~100-150 tokens)"]
+        C1["Canonical AGENTS.md (capped at 400 tokens)"]
         C2["Domain Codex (Invariants, Ethics, Tone)"]
         C3["OKF Memory Bridge (Deterministic Triggers)"]
         C4["Agent Action Grammar (AAG) Micro-Syntax"]
@@ -54,7 +54,7 @@ In DMAA, every agent configuration is structured by a universal composition:
 
 $$\text{AGENTS.md} = \underbrace{\text{Domain Codex (AAG)}}_{\text{Project Invariants, Tone, Guardrails}} + \underbrace{\text{OKF Memory Bridge}}_{\text{Standardized Triggers: Search-Before-Write}}$$
 
-* **Layer 1: Normative Working Memory (Push Layer)**: A permanent, ultra-compact behavioral codex (~100–150 tokens) expressed in [**Agent Action Grammar (AAG)**](docs/spec/AGENT_ACTION_GRAMMAR_RFC.md). Loaded at session start, enforcing zero-tolerance invariants.
+* **Layer 1: Normative Working Memory (Push Layer)**: A permanent, ultra-compact behavioral codex (capped at 400 tokens) expressed in [**Agent Action Grammar (AAG)**](docs/spec/AGENT_ACTION_GRAMMAR_RFC.md). Loaded at session start, enforcing zero-tolerance invariants.
 * **Layer 2: Semantic Domain Memory (Pull Layer)**: An [**OKF v0.2**](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) knowledge bundle (`knowledge/`) that consumes **0 tokens at baseline** and is queried on-demand in microseconds.
 
 ```mermaid
