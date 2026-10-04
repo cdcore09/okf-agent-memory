@@ -85,7 +85,7 @@ okf search [query] [bundle-path] \
     * `user`: Searches only personal developer memory in `~/.okf/` (or `$OKF_USER_DIR`).
     * `system`: Searches only enterprise/system memory in `/etc/okf/` (or `$OKF_SYSTEM_DIR`).
   * `--for-path <path>`: Filters concepts governing a specific source file or directory via `code_refs` (exact match, directory prefix, standard glob, or recursive `**` wildcard).
-  * `--filter <expr>`: Filters concepts by frontmatter key-value predicates (supports `=`, `!=`, `null`/`nil` checks, and comma- or semicolon-separated clauses that must all match). Keys are the frontmatter field names exactly as written in the file (`tags`, `code_refs`, ...); there are no singular aliases. Examples:
+  * `--filter <expr>`: Filters concepts by frontmatter key-value predicates (supports `=`, `!=`, `null`/`nil` checks, and comma- or semicolon-separated clauses that must all match). Keys are the frontmatter field names exactly as written in the file (`tags`, `code_refs`, `description`, ...); there are no aliases, so `--filter desc=...` does not address the description even though `okf create --desc` and `okf update --desc` set it. `id` and `path` are also accepted; they are properties of the concept rather than frontmatter fields. Examples:
     * `--filter "type=Decision"`
     * `--filter "verified.by=human"`
     * `--filter "verified.by!=null,governance=constraint"`

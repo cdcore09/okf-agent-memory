@@ -173,21 +173,25 @@ func TestConceptMatchesFilterCustomListFields(t *testing.T) {
 
 func TestConceptMatchesFilterUsesFrontmatterKeyNames(t *testing.T) {
 	builtIn := &Concept{
-		ID:       "auth/jwt",
-		Tags:     []string{"security"},
-		CodeRefs: []string{"pkg/auth/*.go"},
+		ID:          "auth/jwt",
+		Description: "JWT validation",
+		Tags:        []string{"security"},
+		CodeRefs:    []string{"pkg/auth/*.go"},
 	}
-	for _, filter := range []string{"tag=security", "code_ref=pkg/auth/*.go"} {
+	for _, filter := range []string{"tag=security", "code_ref=pkg/auth/*.go", "desc=JWT validation"} {
 		if ok, _ := builtIn.MatchesFilter(filter); ok {
-			t.Errorf("MatchesFilter(%q) must not alias the plural frontmatter key", filter)
+			t.Errorf("MatchesFilter(%q) must not alias a frontmatter key", filter)
 		}
+	}
+	if ok, _ := builtIn.MatchesFilter("description=JWT validation"); !ok {
+		t.Error("MatchesFilter(\"description=...\") should match the description")
 	}
 
 	custom := &Concept{
 		ID:    "notes/solo",
-		Extra: map[string]any{"tag": "solo", "code_ref": "x"},
+		Extra: map[string]any{"tag": "solo", "code_ref": "x", "desc": "short"},
 	}
-	for _, filter := range []string{"tag=solo", "code_ref=x"} {
+	for _, filter := range []string{"tag=solo", "code_ref=x", "desc=short"} {
 		if ok, _ := custom.MatchesFilter(filter); !ok {
 			t.Errorf("MatchesFilter(%q) should match the custom field of that name", filter)
 		}

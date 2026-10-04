@@ -177,7 +177,7 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 		return compareString(c.Type, p.operator, p.value, isNullCheck)
 	case "title":
 		return compareString(c.Title, p.operator, p.value, isNullCheck)
-	case "description", "desc":
+	case "description":
 		return compareString(c.Description, p.operator, p.value, isNullCheck)
 	case "status":
 		return compareString(c.Status, p.operator, p.value, isNullCheck)
