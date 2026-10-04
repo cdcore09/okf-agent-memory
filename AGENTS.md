@@ -12,7 +12,7 @@
 - MUST execute `okf_search(query=keywords, limit=3)` before proposing architecture, dependencies, or changes.
 - NEVER scan `knowledge/` via `list_dir`, `grep_search`, `find`, or raw readers.
 - NEVER forge human verification (`verified:` is human-only; declare `generated: { by: "<actor>", at: "<iso-time>" }`).
-- NEVER credit dedicated agent accounts in CONTRIBUTORS or release notes (human-only).
+- NEVER credit the project's own agent or bot accounts (e.g. Jules, Claude Bot) in CONTRIBUTORS or release notes. External reporters and contributors are credited by handle, whether or not an agent files their report.
 - PREFER native `okf_*` MCP tools OVER CLI fallback commands.
 
 ## 2. Guard Clauses & Scope Governance

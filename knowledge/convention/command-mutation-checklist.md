@@ -71,7 +71,7 @@ flowchart TD
 - [ ] **Getting Started (`docs/guides/GETTING_STARTED.md`)**: Update onboarding workflows if default commands changed.
 - [ ] **Project README (`README.md`)**: Update command tables and summary cheat-sheets.
 - [ ] **Release Notes (`docs/releases/vX.Y.Z.md`)**: Document new features, enhancements, and flags.
-  - *Invariant*: Never credit dedicated AI agent accounts in contributors or release notes (human-only).
+  - *Invariant*: Never credit the project's own agent or bot accounts in contributors or release notes. Credit external reporters and contributors by handle, whether or not an agent files their report.
 
 ---
 

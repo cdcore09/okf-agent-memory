@@ -41,7 +41,7 @@ Whenever a new release is prepared, verify and update the following files:
 | **`docs/releases/README.md`** | **MANDATORY** | Release history table. Append new row with version, date, and 1-line summary. |
 | **`knowledge/log.md`** | **MANDATORY** | Append dated entry `## YYYY-MM-DD` recording the release and any concept updates. |
 | **`knowledge/roadmap/milestones.md`** | **MANDATORY** | Update phase count and ensure the completed phase row accurately reflects deliverables. |
-| **`CONTRIBUTORS.md`** | **MANDATORY** | Credit all users who contributed code, bug reports, issue reproductions, or architectural feedback. |
+| **`CONTRIBUTORS.md`** | **MANDATORY** | Credit all users who contributed code, bug reports, issue reproductions, or architectural feedback. Never credit the project's own agent or bot accounts. Reporters whose operator is unknown are thanked in the release notes; adding them here is at the maintainer's discretion. |
 | **`docs/security/SECURITY_AUDIT.md`** | Optional | Update if security audit protocols, Jules templates, or invariants changed. |
 | **`README.md`** | Optional | Update if release archive links, version badges, or CLI examples need alignment. |
 
@@ -170,7 +170,7 @@ Copy this checklist into release tracking issues or PR descriptions:
 - [ ] `docs/releases/README.md` updated with new release entry row
 - [ ] `knowledge/log.md` contains dated release entry
 - [ ] `knowledge/roadmap/milestones.md` updated with phase status and deliverables
-- [ ] `CONTRIBUTORS.md` updated with credit for all issue reporters and PR contributors
+- [ ] `CONTRIBUTORS.md` updated with credit for issue reporters and PR contributors (reporters with an unknown operator: release notes only, unless the maintainer decides otherwise)
 
 #### Git & Tagging
 - [ ] Changes committed to `develop` and pushed
