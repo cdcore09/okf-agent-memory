@@ -85,11 +85,12 @@ okf search [query] [bundle-path] \
     * `user`: Searches only personal developer memory in `~/.okf/` (or `$OKF_USER_DIR`).
     * `system`: Searches only enterprise/system memory in `/etc/okf/` (or `$OKF_SYSTEM_DIR`).
   * `--for-path <path>`: Filters concepts governing a specific source file or directory via `code_refs` (exact match, directory prefix, standard glob, or recursive `**` wildcard).
-  * `--filter <expr>`: Filters concepts by frontmatter key-value predicates (supports `=`, `!=`, `null`/`nil` checks, and comma-separated clauses). Examples:
+  * `--filter <expr>`: Filters concepts by frontmatter key-value predicates (supports `=`, `!=`, `null`/`nil` checks, and comma- or semicolon-separated clauses that must all match). Keys are the frontmatter field names exactly as written in the file (`tags`, `code_refs`, ...); there are no singular aliases. Examples:
     * `--filter "type=Decision"`
     * `--filter "verified.by=human"`
     * `--filter "verified.by!=null,governance=constraint"`
     * `--filter "tags=security"`
+    * `--filter "tags=ci,tags=ui"` (a comma starts a new clause, so repeat the key to require several tags; concepts must have all of them. `tags=ci,ui` is rejected because `ui` is not a clause. There is no OR operator.)
     * `--filter "topics=retrieval"` (any list-valued field, built-in or custom, matches when it contains the value; `topics!=retrieval` matches when it does not, and `topics=null` matches an empty list)
   * `--stale-within <duration>`: Filters concepts that are already stale or will expire within relative horizon (e.g. `14d`, `2w`, `3m`).
   * `--limit <N>` (default: `10`): Maximum results to return.

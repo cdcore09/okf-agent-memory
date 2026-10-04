@@ -171,6 +171,48 @@ func TestConceptMatchesFilterCustomListFields(t *testing.T) {
 	}
 }
 
+func TestConceptMatchesFilterUsesFrontmatterKeyNames(t *testing.T) {
+	builtIn := &Concept{
+		ID:       "auth/jwt",
+		Tags:     []string{"security"},
+		CodeRefs: []string{"pkg/auth/*.go"},
+	}
+	for _, filter := range []string{"tag=security", "code_ref=pkg/auth/*.go"} {
+		if ok, _ := builtIn.MatchesFilter(filter); ok {
+			t.Errorf("MatchesFilter(%q) must not alias the plural frontmatter key", filter)
+		}
+	}
+
+	custom := &Concept{
+		ID:    "notes/solo",
+		Extra: map[string]any{"tag": "solo", "code_ref": "x"},
+	}
+	for _, filter := range []string{"tag=solo", "code_ref=x"} {
+		if ok, _ := custom.MatchesFilter(filter); !ok {
+			t.Errorf("MatchesFilter(%q) should match the custom field of that name", filter)
+		}
+	}
+}
+
+func TestConceptMatchesFilterMultipleTags(t *testing.T) {
+	both := &Concept{ID: "a", Tags: []string{"ci", "ui"}}
+	onlyCI := &Concept{ID: "b", Tags: []string{"ci"}}
+
+	// Clauses are ANDed, so repeating the key requires every tag.
+	const allOf = "tags=ci,tags=ui"
+	if ok, err := both.MatchesFilter(allOf); err != nil || !ok {
+		t.Errorf("MatchesFilter(%q) on both tags = %v, %v; want true, nil", allOf, ok, err)
+	}
+	if ok, err := onlyCI.MatchesFilter(allOf); err != nil || ok {
+		t.Errorf("MatchesFilter(%q) on one tag = %v, %v; want false, nil", allOf, ok, err)
+	}
+
+	// A comma starts a new clause; a bare value is not a clause.
+	if _, err := both.MatchesFilter("tags=ci,ui"); err == nil {
+		t.Error("MatchesFilter(\"tags=ci,ui\") must report the clause without an operator")
+	}
+}
+
 func TestConceptMatchesFilterParsedCustomLists(t *testing.T) {
 	for name, fields := range map[string]string{
 		"flow list":  "topics: [retrieval, ranking]",

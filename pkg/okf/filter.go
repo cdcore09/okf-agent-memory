@@ -190,10 +190,10 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 	case "stale_after":
 		return compareString(c.StaleAfter, p.operator, p.value, isNullCheck)
 
-	case "tags", "tag":
+	case "tags":
 		return matchList(c.Tags, p, isNullCheck)
 
-	case "code_refs", "code_ref":
+	case "code_refs":
 		return matchList(c.CodeRefs, p, isNullCheck)
 
 	case "verified":
