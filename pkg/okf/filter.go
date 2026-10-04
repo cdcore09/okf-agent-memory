@@ -2,6 +2,7 @@ package okf
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -190,44 +191,10 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 		return compareString(c.StaleAfter, p.operator, p.value, isNullCheck)
 
 	case "tags", "tag":
-		if isNullCheck {
-			hasTags := len(c.Tags) > 0
-			if p.operator == "!=" {
-				return hasTags
-			}
-			return !hasTags
-		}
-		contains := false
-		for _, t := range c.Tags {
-			if strings.EqualFold(t, p.value) {
-				contains = true
-				break
-			}
-		}
-		if p.operator == "=" {
-			return contains
-		}
-		return !contains
+		return matchList(c.Tags, p, isNullCheck)
 
 	case "code_refs", "code_ref":
-		if isNullCheck {
-			hasRefs := len(c.CodeRefs) > 0
-			if p.operator == "!=" {
-				return hasRefs
-			}
-			return !hasRefs
-		}
-		contains := false
-		for _, ref := range c.CodeRefs {
-			if strings.EqualFold(ref, p.value) {
-				contains = true
-				break
-			}
-		}
-		if p.operator == "=" {
-			return contains
-		}
-		return !contains
+		return matchList(c.CodeRefs, p, isNullCheck)
 
 	case "verified":
 		hasVerified := len(c.Verified) > 0
@@ -328,6 +295,25 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 		}
 		return p.operator == "!="
 	}
+}
+
+// matchList applies a filter predicate to a list-valued field: "=" means the list contains the value
+// (case-insensitive), and a null check tests whether the list is empty.
+func matchList(items []string, p filterPredicate, isNullCheck bool) bool {
+	if isNullCheck {
+		hasItems := len(items) > 0
+		if p.operator == "!=" {
+			return hasItems
+		}
+		return !hasItems
+	}
+	contains := slices.ContainsFunc(items, func(item string) bool {
+		return strings.EqualFold(item, p.value)
+	})
+	if p.operator == "=" {
+		return contains
+	}
+	return !contains
 }
 
 func compareString(actual, op, expected string, isNullCheck bool) bool {
