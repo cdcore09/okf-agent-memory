@@ -217,6 +217,31 @@ func TestConceptMatchesFilterMultipleTags(t *testing.T) {
 	}
 }
 
+func TestConceptMatchesFilterVerifiedByHuman(t *testing.T) {
+	verifiedBy := func(by string) *Concept {
+		return &Concept{ID: "note", Verified: []Verified{{By: by, At: "2026-01-01"}}}
+	}
+	tests := []struct {
+		by    string
+		match bool
+	}{
+		{"human:lead", true},
+		{"human/lead", true},
+		{"Human:Lead", true},
+		{"agent/claude", false},
+		{"humanoid-bot", false},
+	}
+	for _, tt := range tests {
+		got, err := verifiedBy(tt.by).MatchesFilter("verified.by=human")
+		if err != nil {
+			t.Fatalf("MatchesFilter returned error: %v", err)
+		}
+		if got != tt.match {
+			t.Errorf("verified.by=human on %q = %v, want %v", tt.by, got, tt.match)
+		}
+	}
+}
+
 func TestConceptMatchesFilterParsedCustomLists(t *testing.T) {
 	for name, fields := range map[string]string{
 		"flow list":  "topics: [retrieval, ranking]",

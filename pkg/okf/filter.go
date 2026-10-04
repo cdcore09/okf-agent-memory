@@ -227,7 +227,7 @@ func (c *Concept) evalPredicate(p filterPredicate) bool {
 			return !hasAny
 		}
 		for _, v := range c.Verified {
-			if strings.EqualFold(v.By, p.value) || (p.value == "human" && strings.HasPrefix(strings.ToLower(v.By), "human")) {
+			if strings.EqualFold(v.By, p.value) || (strings.EqualFold(p.value, "human") && IsHumanIdentity(v.By)) {
 				return p.operator == "="
 			}
 		}

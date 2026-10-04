@@ -417,6 +417,9 @@ func SaveConcept(bundleDir string, c *Concept, opts SaveOptions) error {
 	if actor == "" {
 		actor = "agent/okf-tool"
 	}
+	if err := ensureNoForgedHumanVerification(fullPath, c, actor, opts.IsNew); err != nil {
+		return err
+	}
 	c.Generated = &Generated{
 		By: actor,
 		At: time.Now().UTC().Format(time.RFC3339),

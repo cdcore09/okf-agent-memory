@@ -880,6 +880,75 @@ func TestSymlinkSecurityRejectsMissingRoot(t *testing.T) {
 	}
 }
 
+func TestSaveConceptRejectsAgentAddedHumanVerification(t *testing.T) {
+	forged := []string{"human:attacker", "human/attacker", "Human:attacker", "HUMAN/attacker", "  human:attacker", "human"}
+	for _, by := range forged {
+		t.Run(by, func(t *testing.T) {
+			bundleDir := t.TempDir()
+			if err := InitBundle(bundleDir); err != nil {
+				t.Fatalf("InitBundle failed: %v", err)
+			}
+			c := &Concept{Path: "note.md", Type: "Fact", Title: "Note", Verified: []Verified{{By: by, At: "2026-01-01"}}}
+			if err := SaveConcept(bundleDir, c, SaveOptions{IsNew: true, Actor: "agent/test"}); err == nil {
+				t.Fatalf("agent must not create a concept verified by %q", by)
+			}
+			if _, err := os.Stat(filepath.Join(bundleDir, "note.md")); !os.IsNotExist(err) {
+				t.Fatalf("rejected concept must not be written: %v", err)
+			}
+		})
+	}
+}
+
+func TestSaveConceptHumanVerificationLifecycle(t *testing.T) {
+	bundleDir := t.TempDir()
+	if err := InitBundle(bundleDir); err != nil {
+		t.Fatalf("InitBundle failed: %v", err)
+	}
+	verified := Verified{By: "human/lead", At: "2026-01-01"}
+	c := &Concept{Path: "note.md", Type: "Fact", Title: "Note", Verified: []Verified{verified}}
+
+	if err := SaveConcept(bundleDir, c, SaveOptions{IsNew: true, Actor: "human/lead"}); err != nil {
+		t.Fatalf("a human may record a human verification: %v", err)
+	}
+
+	c.Title = "Note updated"
+	if err := SaveConcept(bundleDir, c, SaveOptions{Actor: "agent/test"}); err != nil {
+		t.Fatalf("an agent may preserve an existing human verification: %v", err)
+	}
+
+	c.Verified = []Verified{{By: "human/lead", At: "2026-02-02"}}
+	if err := SaveConcept(bundleDir, c, SaveOptions{Actor: "agent/test"}); err == nil {
+		t.Error("an agent must not alter an existing human verification")
+	}
+
+	c.Verified = append([]Verified{verified}, Verified{By: "human/manager", At: "2026-01-02"})
+	if err := SaveConcept(bundleDir, c, SaveOptions{Actor: "agent/test"}); err == nil {
+		t.Error("an agent must not add a second human verification")
+	}
+
+	c.Verified = []Verified{verified, {By: "agent/reviewer", At: "2026-01-03"}, {By: "humanoid-bot", At: "2026-01-03"}}
+	if err := SaveConcept(bundleDir, c, SaveOptions{Actor: "agent/test"}); err != nil {
+		t.Errorf("an agent may add non-human verifiers: %v", err)
+	}
+}
+
+func TestSaveConceptNewConceptDoesNotInheritRecordedVerification(t *testing.T) {
+	bundleDir := t.TempDir()
+	if err := InitBundle(bundleDir); err != nil {
+		t.Fatalf("InitBundle failed: %v", err)
+	}
+	verified := Verified{By: "human/lead", At: "2026-01-01"}
+	c := &Concept{Path: "note.md", Type: "Fact", Title: "Note", Verified: []Verified{verified}}
+	if err := SaveConcept(bundleDir, c, SaveOptions{IsNew: true, Actor: "human/lead"}); err != nil {
+		t.Fatalf("setup failed: %v", err)
+	}
+
+	replacement := &Concept{Path: "note.md", Type: "Fact", Title: "Replacement", Verified: []Verified{verified}}
+	if err := SaveConcept(bundleDir, replacement, SaveOptions{IsNew: true, Actor: "agent/test"}); err == nil {
+		t.Error("an agent creating a concept over an existing path must not inherit its human verification")
+	}
+}
+
 func TestFrontmatterSmugglingInBody(t *testing.T) {
 	bundleDir := t.TempDir()
 	if err := InitBundle(bundleDir); err != nil {

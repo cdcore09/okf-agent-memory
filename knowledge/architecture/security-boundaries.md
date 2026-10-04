@@ -50,6 +50,12 @@ OKF bundles are designed for shared Git repository version control:
 - Files are created with `0o644` (rw-r--r--) and directories with `0o755` (rwxr-xr-x).
 - Static analysis rules intended for secret credential files (such as `gosec G301/G306` requiring `0600`/`0750`) are deliberately excluded, ensuring bundle readability across multi-user environments, CI/CD runners, and Git sub-processes.
 
+### 6. Human Verification Provenance (`ensureNoForgedHumanVerification`)
+`SaveConcept` refuses to let a non-human actor add a human verification:
+- A human identity is `human`, `human:*`, or `human/*`, compared case-insensitively (`IsHumanIdentity`). The `verified.by=human` filter uses the same definition, so the guard and the filter cannot disagree.
+- An agent may preserve `verified` entries already recorded in the concept file. Adding one, or altering the timestamp of an existing one, is rejected. A new concept inherits nothing from an existing file at its path.
+- Scope of the guarantee: the actor is self-declared. The MCP server fixes it to `agent/mcp`, so the guard is effective there. A CLI user can still pass `--actor human/...`, so for the CLI it guards against accidental or injected forgery, not against a deliberate caller.
+
 ## Relationships
 
 - Defined as part of Layer 4 in [layers](layers.md).

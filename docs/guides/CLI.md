@@ -173,7 +173,7 @@ okf create <concept-id> [bundle-path] \
   * `--body`: Markdown content following frontmatter.
   * `--status`: Lifecycle status (`draft`, `stable`, or `deprecated`; default `stable`).
   * `--tags`: Comma-separated list of tags.
-  * `--actor`: Author string (default: `agent/cli`).
+  * `--actor`: Author string (default: `agent/cli`). An actor that is not human (`human`, `human:*`, `human/*`) cannot add human `verified` entries.
   * `--no-log`: Skips appending an entry to `log.md`.
   * `--no-index`: Skips updating the parent `index.md` listing.
 
@@ -204,7 +204,7 @@ okf update <concept-id> [bundle-path] \
   * `--type`: Updated non-empty concept type.
   * `--status`: Updated lifecycle status (`draft`, `stable`, or `deprecated`).
   * `--tags`: Replacement comma-separated tags (pass `--tags ""` to clear tags).
-  * `--actor`: Author provenance identifier (default: `agent/cli`).
+  * `--actor`: Author provenance identifier (default: `agent/cli`). An actor that is not human (`human`, `human:*`, `human/*`) can keep existing human `verified` entries but cannot add or change them.
   * `--no-log`: Skips appending an entry to `log.md`.
   * `--no-index`: Skips updating the parent `index.md` listing.
   * `--json`: Emit machine-readable JSON result.
