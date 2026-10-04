@@ -311,7 +311,7 @@ func SearchLayered(opts LayeredSearchOptions) ([]SearchResult, error) {
 				if kInfo, kErr := os.Stat(filepath.Join(uDir, "knowledge")); kErr == nil && kInfo.IsDir() {
 					cand = filepath.Join(uDir, "knowledge")
 				}
-				if ub, err := LoadBundle(cand); err == nil {
+				if ub, err := loadTrustedBundle(cand); err == nil {
 					uResults, _ := ub.SearchAdvanced(opts.SearchOpts)
 					for _, ur := range uResults {
 						rawID := ur.ConceptID
@@ -344,7 +344,7 @@ func SearchLayered(opts LayeredSearchOptions) ([]SearchResult, error) {
 				if kInfo, kErr := os.Stat(filepath.Join(sDir, "knowledge")); kErr == nil && kInfo.IsDir() {
 					cand = filepath.Join(sDir, "knowledge")
 				}
-				if sb, err := LoadBundle(cand); err == nil {
+				if sb, err := loadTrustedBundle(cand); err == nil {
 					sResults, _ := sb.SearchAdvanced(opts.SearchOpts)
 					for _, sr := range sResults {
 						rawID := sr.ConceptID
@@ -453,7 +453,11 @@ func ResolveScopedConcept(rawID, defaultBundleDir, vendorRoot, userDir, systemDi
 		}
 	}
 
-	b, err := LoadBundle(bundleDir)
+	load := LoadBundle
+	if showScope == ScopeUser || showScope == ScopeSystem {
+		load = loadTrustedBundle
+	}
+	b, err := load(bundleDir)
 	if err != nil {
 		return nil, fmt.Errorf("error loading bundle from %q: %w", bundleDir, err)
 	}

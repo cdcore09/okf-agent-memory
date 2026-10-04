@@ -1,3 +1,6 @@
+## 2026-10-04
+* **Update**: Updated concept `architecture/security-boundaries.md`.
+
 ## 2026-10-01
 * **Creation**: Documented concept `convention/command-mutation-checklist.md` (CLI and MCP Command Modification Checklist).
 * **Update**: Documented the 4-tier Scope Specification Matrix, multi-scope search filtering (`--scope`), and hermetic external link validator guarantees in `architecture/registry-and-vendor-layering.md`.
