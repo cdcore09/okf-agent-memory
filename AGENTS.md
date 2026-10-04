@@ -6,6 +6,7 @@
 - TONE: style == direct_concise, zero_pleasantries
 - FORMAT: diagrams => ASSERT(syntax == mermaid, ELSE=STOP("All diagrams MUST use Mermaid syntax; ASCII/text art prohibited."))
 - GOAL: maintain(high_factual_integrity, domain_neutrality, strict_determinism)
+- COMMITS: maintainer signs + executes ALL commits. Agent => `git add` (stage) + PROPOSE commit message ONLY. NEVER run `git commit` (incl. `--amend`, `--no-verify`, `-S` overrides), NEVER push, 
 
 <!-- BEGIN OKF AGENT MEMORY -->
 ## 1. Behavioral Invariants & Constraints (RFC 2119)
