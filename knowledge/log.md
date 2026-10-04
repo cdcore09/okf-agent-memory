@@ -1,4 +1,6 @@
 ## 2026-10-04
+* **Release**: Published version v0.6.0: symlinked bundle roots load correctly and stay confined (#45), custom list frontmatter fields stay typed lists across `okf update` (#49), `--filter` matches list-valued custom fields (#48), and `--filter` keys are exactly the frontmatter field names (breaking: removed the `tag`, `code_ref`, and `desc` aliases).
+* **Update**: Clarified the credit rule in `convention/release-procedure.md` and `convention/command-mutation-checklist.md`: never credit the project's own agent or bot accounts, credit external reporters and contributors by handle whether or not an agent files their report.
 * **Update**: Updated concept `architecture/metadata-roundtrip.md`.
 * **Update**: Updated concept `architecture/security-boundaries.md`.
 
