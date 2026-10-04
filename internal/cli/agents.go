@@ -217,8 +217,8 @@ func runAgentsLint(args []string) error {
 	}
 
 	fmt.Printf("AAG Linter: %s\n", targetFile)
-	fmt.Printf("Token Stats: %d estimated tokens (Budget: %d tokens)\n\n",
-		res.TokenStats.EstimatedTokens, res.TokenStats.BudgetLimit)
+	fmt.Printf("Token Stats: %d estimated tokens in managed block (Budget: %d tokens), %d in total file\n\n",
+		res.TokenStats.EstimatedTokens, res.TokenStats.BudgetLimit, res.TokenStats.TotalTokens)
 
 	if len(res.Findings) == 0 {
 		fmt.Printf("✓ All AAG rules passed (0 errors, 0 warnings). 100%% conformant.\n")
