@@ -54,6 +54,6 @@ const DefaultBudgetLimit = 400
 
 // LinterOptions configures the AAG linter behavior.
 type LinterOptions struct {
-	BudgetLimit int  // Max token budget (default: 400, or 150 for strict micro-syntax)
+	BudgetLimit int  // Max token budget for the managed block (default: 400)
 	Strict      bool // Treat warnings as errors
 }

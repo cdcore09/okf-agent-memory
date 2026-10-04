@@ -179,7 +179,7 @@ Commands:
 
 Flags:
   --domain <name>  Domain profile (software, research, legal, coaching, books)
-  --budget <int>   Token budget cap (default: 400 for file, 150 for micro-syntax)
+  --budget <int>   Token budget cap for the managed block (default: 400)
   --strict         Treat warnings as fatal errors
   --force          Overwrite existing files or symlinks
   --check          Verify symlink integrity without mutating
