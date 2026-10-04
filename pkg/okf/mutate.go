@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -12,6 +13,10 @@ import (
 )
 
 var newlineReplacer = strings.NewReplacer("\r", " ", "\n", " ")
+
+// frontmatterSmuggleRegex matches reserved frontmatter keys in a body line, including quoted keys
+// and whitespace before the colon, which a plain prefix check would miss.
+var frontmatterSmuggleRegex = regexp.MustCompile(`(?i)^\s*["']?(verified|governance|generated|type|status|code_refs|stale_after)["']?\s*:`)
 
 func titleCase(s string) string {
 	if s == "" {
@@ -375,11 +380,8 @@ func sanitizeConceptMetadata(c *Concept) error {
 				if trimmed == "" {
 					continue
 				}
-				lower := strings.ToLower(trimmed)
-				for _, key := range []string{"verified:", "governance:", "generated:", "type:", "status:", "code_refs:", "stale_after:"} {
-					if strings.HasPrefix(lower, key) {
-						return fmt.Errorf("concept body cannot smuggle frontmatter block containing %q", key)
-					}
+				if match := frontmatterSmuggleRegex.FindStringSubmatch(trimmed); match != nil {
+					return fmt.Errorf("concept body cannot smuggle frontmatter block containing %q", match[1])
 				}
 			}
 		}

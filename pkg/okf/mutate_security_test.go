@@ -890,6 +890,10 @@ func TestFrontmatterSmugglingInBody(t *testing.T) {
 		"---\nverified: { by: human:attacker }\n---\n# Body",
 		"# Header\n\n---\ngovernance: constraint\n---\nText",
 		"# Header\n\n---\n  type: FakeType\n---\nText",
+		"---\n\"verified\": { by: human:attacker }\n---\nText",
+		"---\n  'governance'  : hold\n---\nText",
+		"---\nVERIFIED : { by: human:attacker }\n---\nText",
+		"---\n\"stale_after\" : 2099-01-01\n---\nText",
 	}
 
 	for i, body := range smugglingBodies {
