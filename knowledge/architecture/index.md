@@ -10,3 +10,4 @@
 * [Governance vs. Execution Context and Code Binding](governance-model.md) - 3-tier epistemic governance model (constraint, hold, context) and code-to-knowledge binding via code_refs.
 * [Zero-Knowledge Vault Cryptography and Blind Sync Architecture](zero-knowledge-vault-sync.md) - Client-side zero-knowledge AES-256-GCM envelope encryption, Argon2id KDF, CAS blind storage, 3-way reconcile sync protocol, and Bearer auth.
 * [OKF Registry Client, Dependency Locking, and Multi-Scope Vendor Layering](registry-and-vendor-layering.md) - Decentralized package registry client, zero-dependency okf.lock manifest, multi-scope priority layering, and hermetic @ cross-scope URI routing.
+* [Persistent Hub Sync State Across CLI Invocations](persistent-sync-state.md) - okf hub push, pull, and sync persist the last-synced head and tree in a per-device .okf-sync-state.json so each new process keeps a correct CAS expected head and 3-way reconcile base.

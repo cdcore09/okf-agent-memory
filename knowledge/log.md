@@ -1,3 +1,8 @@
+## 2026-10-07
+* **Update**: Linked `architecture/zero-knowledge-vault-sync.md` to `architecture/persistent-sync-state.md` (How the CLI persists the last-synced head and tree between invocations).
+* **Update**: Linked `architecture/persistent-sync-state.md` to `architecture/zero-knowledge-vault-sync.md` (Restores the CAS expected head and 3-way reconcile base that the sync protocol assumes across CLI invocations).
+* **Creation**: Documented concept `architecture/persistent-sync-state.md` (Persistent Hub Sync State Across CLI Invocations).
+
 ## 2026-10-04
 * **Update**: `convention/release-procedure.md` now reserves signed commits, merges, tags, and pushes for the maintainer; agents only stage changes and propose the commit message and must not disable the sandbox. Aligned `docs/project/playbooks/RELEASE_PLAYBOOK.md`.
 * **Update**: `convention/dual-memory-architecture.md` states the enforced 400-token cap (`AAG-005`) for the managed block instead of the unenforced 100-150 token target. Aligned the AAG and DMAA RFCs and the README.

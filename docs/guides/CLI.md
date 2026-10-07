@@ -334,6 +334,11 @@ Performs a full two-way synchronization cycle (Pull + Push). If an HTTP 409 conf
 okf hub sync [bundle-path] [-hub <url>] [-auth-token <token>] [-password <pass>] [-secret-key <key>] [-message <msg>]
 ```
 
+##### Local sync state (`.okf-sync-state.json`)
+`push`, `pull`, and `sync` record the last commit agreed with the hub, and its tree manifest, in `.okf-sync-state.json` next to `.okf-vault.json`. The next invocation uses it as the expected head for the atomic commit and as the base of the 3-way reconcile, so unchanged files are not re-encrypted and edits on one device are not mistaken for collisions.
+
+The file is per-device, written atomically with owner-only permissions, and never uploaded. It holds only paths and hashes of files already present locally. If the bundle is also tracked in Git, add `.okf-sync-state.json` to `.gitignore`. Deleting it is safe: the next `sync` falls back to a full reconcile against the hub.
+
 ##### E. `serve`
 Runs the embedded blind CAS and atomic head pointer server locally on the specified port.
 

@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -135,7 +136,10 @@ func HubPush(w io.Writer, op HubOp) error {
 		return fmt.Errorf("failed to derive vault key: %w", err)
 	}
 
-	engine := NewEngine(op.Client, op.VaultID, vaultKey, op.Dir)
+	engine, err := newHubEngine(op, vaultKey)
+	if err != nil {
+		return err
+	}
 	hostname, _ := os.Hostname()
 	if hostname == "" {
 		hostname = "local-device"
@@ -146,7 +150,7 @@ func HubPush(w io.Writer, op HubOp) error {
 	}
 
 	res, err := engine.Push(context.Background(), author, op.Message)
-	if err != nil {
+	if err := warnOnStateSaveError(w, err); err != nil {
 		return fmt.Errorf("push failed: %w", err)
 	}
 
@@ -161,9 +165,12 @@ func HubPull(w io.Writer, op HubOp) error {
 		return fmt.Errorf("failed to derive vault key: %w", err)
 	}
 
-	engine := NewEngine(op.Client, op.VaultID, vaultKey, op.Dir)
-	res, err := engine.Pull(context.Background())
+	engine, err := newHubEngine(op, vaultKey)
 	if err != nil {
+		return err
+	}
+	res, err := engine.Pull(context.Background())
+	if err := warnOnStateSaveError(w, err); err != nil {
 		return fmt.Errorf("pull failed: %w", err)
 	}
 
@@ -178,7 +185,10 @@ func HubSync(w io.Writer, op HubOp) error {
 		return fmt.Errorf("failed to derive vault key: %w", err)
 	}
 
-	engine := NewEngine(op.Client, op.VaultID, vaultKey, op.Dir)
+	engine, err := newHubEngine(op, vaultKey)
+	if err != nil {
+		return err
+	}
 	hostname, _ := os.Hostname()
 	if hostname == "" {
 		hostname = "local-device"
@@ -189,7 +199,7 @@ func HubSync(w io.Writer, op HubOp) error {
 	}
 
 	res, err := engine.Sync(context.Background(), author, op.Message)
-	if err != nil {
+	if err := warnOnStateSaveError(w, err); err != nil {
 		return fmt.Errorf("sync failed: %w", err)
 	}
 
@@ -202,4 +212,25 @@ func HubSync(w io.Writer, op HubOp) error {
 
 	_, _ = fmt.Fprintf(w, "Sync completed: commit %s\n", res.CommitHash)
 	return nil
+}
+
+// newHubEngine builds an engine for a CLI hub operation with persistent sync
+// state, so consecutive `okf hub` invocations share the last-synced head and tree.
+func newHubEngine(op HubOp, vaultKey []byte) (*Engine, error) {
+	engine := NewEngine(op.Client, op.VaultID, vaultKey, op.Dir)
+	if err := engine.LoadState(filepath.Join(op.Dir, SyncStateFileName)); err != nil {
+		return nil, err
+	}
+	return engine, nil
+}
+
+// warnOnStateSaveError reports a StateSaveError as a warning (the remote
+// operation already succeeded) and returns any other error unchanged.
+func warnOnStateSaveError(w io.Writer, err error) error {
+	var saveErr *StateSaveError
+	if errors.As(err, &saveErr) {
+		_, _ = fmt.Fprintf(w, "⚠️  %v\n", saveErr)
+		return nil
+	}
+	return err
 }

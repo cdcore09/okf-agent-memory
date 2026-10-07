@@ -345,6 +345,23 @@ func TestHub_Serve_E2E_Socket(t *testing.T) {
 		t.Fatalf("content mismatch for note_b.md on device A: %s", string(pulledNoteB))
 	}
 
+	// A real conflict needs both devices to change the same file: device A edits
+	// note_b.md and syncs first, then device B syncs its own edit of it.
+	_ = os.WriteFile(filepath.Join(dirA, "concepts", "note_b.md"), []byte("# Note B\nEdited on Device A\n"), 0o644)
+	var syncBufA bytes.Buffer
+	err = HubSync(&syncBufA, HubOp{
+		Dir:          dirA,
+		Client:       clientA,
+		VaultID:      cfgA.VaultID,
+		Password:     password,
+		SecretKey:    secretKey,
+		Message:      "Device A edits note B",
+		AgentVersion: "test",
+	})
+	if err != nil {
+		t.Fatalf("device A sync failed: %v", err)
+	}
+
 	_ = os.WriteFile(noteBPath, []byte("# Note B Conflicting Local Edit\n"), 0o644)
 	var syncBufConflict bytes.Buffer
 	err = HubSync(&syncBufConflict, HubOp{

@@ -44,6 +44,7 @@ type Engine struct {
 	BundlePath string
 	cachedTree *vault.Tree
 	cachedHead string
+	statePath  string // when set (via LoadState), cachedHead/cachedTree persist across processes
 }
 
 // NewEngine initializes a synchronization engine for an OKF bundle.
@@ -204,11 +205,15 @@ func (e *Engine) Push(ctx context.Context, author vault.CommitAuthor, message st
 	e.cachedHead = resp.Head
 	e.cachedTree = newTree
 
-	return &PushResult{
+	res := &PushResult{
 		CommitHash:     resp.Head,
 		UploadedBlobs:  len(blobsToUpload),
 		UnchangedBlobs: unchangedCount,
-	}, nil
+	}
+	if err := e.saveState(); err != nil {
+		return res, &StateSaveError{Err: err}
+	}
+	return res, nil
 }
 
 // Pull downloads the latest commit and tree manifest from the hub,
@@ -295,11 +300,15 @@ func (e *Engine) Pull(ctx context.Context) (*PullResult, error) {
 	e.cachedHead = headResp.HeadCommit
 	e.cachedTree = remoteTree
 
-	return &PullResult{
+	res := &PullResult{
 		CommitHash:   headResp.HeadCommit,
 		UpdatedFiles: updated,
 		DeletedFiles: diff.Deleted,
-	}, nil
+	}
+	if err := e.saveState(); err != nil {
+		return res, &StateSaveError{Err: err}
+	}
+	return res, nil
 }
 
 // Sync performs a full synchronization cycle:
@@ -307,10 +316,11 @@ func (e *Engine) Pull(ctx context.Context) (*PullResult, error) {
 // writes local conflict files if necessary, and pushes the merged commit.
 func (e *Engine) Sync(ctx context.Context, author vault.CommitAuthor, message string) (*SyncResult, error) {
 	pushRes, err := e.Push(ctx, author, message)
-	if err == nil {
+	var saveErr *StateSaveError
+	if err == nil || errors.As(err, &saveErr) {
 		return &SyncResult{
 			CommitHash: pushRes.CommitHash,
-		}, nil
+		}, err
 	}
 
 	var conflictErr *HeadConflictError
@@ -507,10 +517,14 @@ func (e *Engine) Sync(ctx context.Context, author vault.CommitAuthor, message st
 		e.cachedHead = resp.Head
 		e.cachedTree = reconcileRes.MergedTree
 
-		return &SyncResult{
+		res := &SyncResult{
 			CommitHash: resp.Head,
 			Conflicts:  reconcileRes.Conflicts,
-		}, nil
+		}
+		if err := e.saveState(); err != nil {
+			return res, &StateSaveError{Err: err}
+		}
+		return res, nil
 	}
 
 	return nil, fmt.Errorf("sync: exceeded maximum reconciliation retries (%d)", DefaultMaxSyncRetries)
