@@ -1,4 +1,11 @@
 ## 2026-10-07
+* **Update**: Linked `architecture/semantic-bookkeeping-merge.md` to `architecture/persistent-sync-state.md` (Needs the persisted base tree to fetch the base index for the 3-way merge).
+* **Update**: Linked `architecture/semantic-bookkeeping-merge.md` to `architecture/zero-knowledge-vault-sync.md` (Extends the 3-way reconcile so bookkeeping files merge semantically instead of colliding).
+* **Update**: Updated concept `architecture/semantic-bookkeeping-merge.md`.
+* **Update**: Linked `architecture/zero-knowledge-vault-sync.md` to `architecture/semantic-bookkeeping-merge.md` (How log.md and index.md collisions are merged during sync).
+* **Update**: Linked `architecture/semantic-bookkeeping-merge.md` to `architecture/persistent-sync-state.md` (Needs the persisted base tree to fetch the base index for the 3-way merge).
+* **Update**: Linked `architecture/semantic-bookkeeping-merge.md` to `architecture/zero-knowledge-vault-sync.md` (Extends the 3-way reconcile so bookkeeping files merge semantically instead of colliding).
+* **Creation**: Documented concept `architecture/semantic-bookkeeping-merge.md` (Semantic Merge of Bookkeeping Files During Hub Sync).
 * **Update**: Linked `architecture/zero-knowledge-vault-sync.md` to `architecture/persistent-sync-state.md` (How the CLI persists the last-synced head and tree between invocations).
 * **Update**: Linked `architecture/persistent-sync-state.md` to `architecture/zero-knowledge-vault-sync.md` (Restores the CAS expected head and 3-way reconcile base that the sync protocol assumes across CLI invocations).
 * **Creation**: Documented concept `architecture/persistent-sync-state.md` (Persistent Hub Sync State Across CLI Invocations).
