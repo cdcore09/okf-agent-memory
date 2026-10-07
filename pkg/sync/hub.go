@@ -34,6 +34,27 @@ func ResolveHubURL(flagURL string, cfg *VaultConfig) string {
 	return "http://127.0.0.1:8080"
 }
 
+// ResolvePassword returns the vault master password from flag or the
+// OKF_HUB_PASSWORD environment variable. There is deliberately no config-file
+// fallback: storing key material next to the bundle would defeat the vault.
+// Prefer the environment over the flag, since flags are visible to other
+// processes on the machine (e.g. via ps).
+func ResolvePassword(flagPassword string) string {
+	if flagPassword != "" {
+		return flagPassword
+	}
+	return os.Getenv("OKF_HUB_PASSWORD")
+}
+
+// ResolveSecretKey returns the vault Secret Key from flag or the
+// OKF_HUB_SECRET_KEY environment variable, with no config-file fallback.
+func ResolveSecretKey(flagSecretKey string) string {
+	if flagSecretKey != "" {
+		return flagSecretKey
+	}
+	return os.Getenv("OKF_HUB_SECRET_KEY")
+}
+
 // ResolveToken returns the auth token from flag, env, config, or empty.
 func ResolveToken(flagToken string, cfg *VaultConfig) string {
 	if flagToken != "" {

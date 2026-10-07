@@ -299,6 +299,12 @@ All hub commands (`push`, `pull`, `sync`, `init-vault`) support optional Bearer 
 - **Environment Variable:** `OKF_HUB_TOKEN` (fallback)
 - **Vault Configuration:** `auth_token` in `.okf-vault.json` (stored fallback)
 
+The vault master password and Secret Key used by `push`, `pull`, and `sync` are resolved from:
+- **CLI Flags:** `-password <pass>` and `-secret-key <key>` (highest precedence)
+- **Environment Variables:** `OKF_HUB_PASSWORD` and `OKF_HUB_SECRET_KEY`
+
+There is no config-file fallback for these, by design. Prefer the environment variables (for example, injected by a secret manager) over the flags, since command-line arguments are visible to other processes on the machine.
+
 The remote hub URL is resolved in order:
 - **CLI Flag:** `-hub <url>`
 - **Vault Configuration:** `hub_url` in `.okf-vault.json`

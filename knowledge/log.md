@@ -1,4 +1,7 @@
 ## 2026-10-07
+* **Update**: Linked `architecture/zero-knowledge-vault-sync.md` to `convention/hub-credential-handling.md` (How the vault password and Secret Key are supplied to hub commands).
+* **Update**: Linked `convention/hub-credential-handling.md` to `architecture/zero-knowledge-vault-sync.md` (Extends the hub credential resolution rules (alongside OKF_HUB_TOKEN) to the vault password and Secret Key).
+* **Creation**: Documented concept `convention/hub-credential-handling.md` (Hub Vault Credentials From Environment).
 * **Update**: Linked `architecture/semantic-bookkeeping-merge.md` to `architecture/persistent-sync-state.md` (Needs the persisted base tree to fetch the base index for the 3-way merge).
 * **Update**: Linked `architecture/semantic-bookkeeping-merge.md` to `architecture/zero-knowledge-vault-sync.md` (Extends the 3-way reconcile so bookkeeping files merge semantically instead of colliding).
 * **Update**: Updated concept `architecture/semantic-bookkeeping-merge.md`.

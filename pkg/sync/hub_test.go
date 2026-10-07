@@ -149,6 +149,30 @@ func TestHub_ResolveToken(t *testing.T) {
 	}
 }
 
+func TestHub_ResolveVaultCredentials(t *testing.T) {
+	t.Setenv("OKF_HUB_PASSWORD", "env-pass")
+	t.Setenv("OKF_HUB_SECRET_KEY", "ENV-KEY")
+
+	if got := ResolvePassword("flag-pass"); got != "flag-pass" {
+		t.Fatalf("flag should win, got %q", got)
+	}
+	if got := ResolvePassword(""); got != "env-pass" {
+		t.Fatalf("expected env password, got %q", got)
+	}
+	if got := ResolveSecretKey("FLAG-KEY"); got != "FLAG-KEY" {
+		t.Fatalf("flag should win, got %q", got)
+	}
+	if got := ResolveSecretKey(""); got != "ENV-KEY" {
+		t.Fatalf("expected env secret key, got %q", got)
+	}
+
+	t.Setenv("OKF_HUB_PASSWORD", "")
+	t.Setenv("OKF_HUB_SECRET_KEY", "")
+	if ResolvePassword("") != "" || ResolveSecretKey("") != "" {
+		t.Fatal("expected empty credentials when neither flag nor env is set")
+	}
+}
+
 func TestHub_BearerAuthProtection(t *testing.T) {
 	dir := t.TempDir()
 	_ = os.WriteFile(filepath.Join(dir, "index.md"), []byte("# Index\n"), 0o644)

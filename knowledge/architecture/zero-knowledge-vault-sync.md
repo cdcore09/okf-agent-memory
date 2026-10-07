@@ -3,7 +3,7 @@ type: Decision
 title: Zero-Knowledge Vault Cryptography and Blind Sync Architecture
 description: "Client-side zero-knowledge AES-256-GCM envelope encryption, Argon2id KDF, CAS blind storage, 3-way reconcile sync protocol, and Bearer auth."
 tags: [vault, crypto, zero-knowledge, sync, cas, reconcile]
-generated: { by: agent/cli, at: "2026-10-07T19:30:16Z" }
+generated: { by: agent/cli, at: "2026-10-07T19:51:41Z" }
 governance: constraint
 code_refs: [pkg/vault, pkg/sync, internal/cli/hub.go]
 ---
@@ -91,3 +91,4 @@ All remote hub communication supports Bearer token authentication to restrict va
 # Related Concepts
 - [Persistent Hub Sync State Across CLI Invocations](persistent-sync-state.md): How the CLI persists the last-synced head and tree between invocations
 - [Semantic Merge of Bookkeeping Files During Hub Sync](semantic-bookkeeping-merge.md): How log.md and index.md collisions are merged during sync
+- [Hub Vault Credentials From Environment](../convention/hub-credential-handling.md): How the vault password and Secret Key are supplied to hub commands

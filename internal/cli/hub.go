@@ -40,8 +40,8 @@ func cmdHub(args []string) {
 		fs := flag.NewFlagSet("hub push", flag.ExitOnError)
 		hubURL := fs.String("hub", "", "Hub server URL (default from .okf-vault.json or http://127.0.0.1:8080)")
 		authToken := fs.String("auth-token", "", "Hub authentication Bearer token (or OKF_HUB_TOKEN env)")
-		password := fs.String("password", "", "Master password")
-		secretKey := fs.String("secret-key", "", "Secret key")
+		password := fs.String("password", "", "Master password (or OKF_HUB_PASSWORD env)")
+		secretKey := fs.String("secret-key", "", "Secret key (or OKF_HUB_SECRET_KEY env)")
 		msg := fs.String("message", "CLI push", "Commit message")
 		_ = fs.Parse(subargs)
 
@@ -61,8 +61,8 @@ func cmdHub(args []string) {
 			Dir:          dir,
 			Client:       client,
 			VaultID:      cfg.VaultID,
-			Password:     *password,
-			SecretKey:    *secretKey,
+			Password:     sync.ResolvePassword(*password),
+			SecretKey:    sync.ResolveSecretKey(*secretKey),
 			Message:      *msg,
 			AgentVersion: Version,
 		}
@@ -75,8 +75,8 @@ func cmdHub(args []string) {
 		fs := flag.NewFlagSet("hub pull", flag.ExitOnError)
 		hubURL := fs.String("hub", "", "Hub server URL (default from .okf-vault.json or http://127.0.0.1:8080)")
 		authToken := fs.String("auth-token", "", "Hub authentication Bearer token (or OKF_HUB_TOKEN env)")
-		password := fs.String("password", "", "Master password")
-		secretKey := fs.String("secret-key", "", "Secret key")
+		password := fs.String("password", "", "Master password (or OKF_HUB_PASSWORD env)")
+		secretKey := fs.String("secret-key", "", "Secret key (or OKF_HUB_SECRET_KEY env)")
 		_ = fs.Parse(subargs)
 
 		dir := "."
@@ -95,8 +95,8 @@ func cmdHub(args []string) {
 			Dir:       dir,
 			Client:    client,
 			VaultID:   cfg.VaultID,
-			Password:  *password,
-			SecretKey: *secretKey,
+			Password:  sync.ResolvePassword(*password),
+			SecretKey: sync.ResolveSecretKey(*secretKey),
 		}
 		if err := sync.HubPull(os.Stdout, op); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -107,8 +107,8 @@ func cmdHub(args []string) {
 		fs := flag.NewFlagSet("hub sync", flag.ExitOnError)
 		hubURL := fs.String("hub", "", "Hub server URL (default from .okf-vault.json or http://127.0.0.1:8080)")
 		authToken := fs.String("auth-token", "", "Hub authentication Bearer token (or OKF_HUB_TOKEN env)")
-		password := fs.String("password", "", "Master password")
-		secretKey := fs.String("secret-key", "", "Secret key")
+		password := fs.String("password", "", "Master password (or OKF_HUB_PASSWORD env)")
+		secretKey := fs.String("secret-key", "", "Secret key (or OKF_HUB_SECRET_KEY env)")
 		msg := fs.String("message", "CLI sync", "Commit message")
 		_ = fs.Parse(subargs)
 
@@ -128,8 +128,8 @@ func cmdHub(args []string) {
 			Dir:          dir,
 			Client:       client,
 			VaultID:      cfg.VaultID,
-			Password:     *password,
-			SecretKey:    *secretKey,
+			Password:     sync.ResolvePassword(*password),
+			SecretKey:    sync.ResolveSecretKey(*secretKey),
 			Message:      *msg,
 			AgentVersion: Version,
 		}
@@ -180,8 +180,8 @@ Commands:
 Flags (push, pull, sync, init-vault):
   -hub <url>               Hub server URL (default from .okf-vault.json or http://127.0.0.1:8080)
   -auth-token <token>      Hub authentication Bearer token (or OKF_HUB_TOKEN env)
-  -password <pass>         Master password
-  -secret-key <key>        Secret key
+  -password <pass>         Master password (or OKF_HUB_PASSWORD env)
+  -secret-key <key>        Secret key (or OKF_HUB_SECRET_KEY env)
   -message <msg>           Commit message (push, sync)
 `)
 }

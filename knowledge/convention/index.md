@@ -9,3 +9,4 @@
 * [Dual-Memory Agent Architecture & Agent Action Grammar](dual-memory-architecture.md) - Two-layer memory model separating normative working memory (Push/AAG) from semantic domain memory (Pull/OKF).
 * [Release Procedure & Distribution Runbook](release-procedure.md) - Canonical procedure for preparing releases, quality gates, file inventory, and the human boundary for signed commits, tags, and pushes.
 * [CLI and MCP Command Modification Checklist](command-mutation-checklist.md) - Comprehensive checklist and invariant gates required when adding or modifying CLI commands, flags, arguments, and MCP tools.
+* [Hub Vault Credentials From Environment](hub-credential-handling.md) - okf hub push, pull, and sync accept the vault password and Secret Key from OKF_HUB_PASSWORD and OKF_HUB_SECRET_KEY, with flags taking precedence and no config-file fallback.
