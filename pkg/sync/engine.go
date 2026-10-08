@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	stdsync "sync"
 	"time"
 
 	"github.com/okf-memory/okf-agent-memory/pkg/vault"
@@ -34,6 +35,9 @@ type SyncResult struct {
 
 // DefaultMaxSyncRetries is the maximum number of times Sync will retry on concurrent head conflicts (HTTP 409).
 const DefaultMaxSyncRetries = 5
+
+// PullConcurrency bounds how many blobs Pull downloads and decrypts at once.
+const PullConcurrency = 16
 
 // Engine coordinates bundle scanning, client-side encryption/decryption,
 // and sync operations with the remote OKF Memory Hub.
@@ -269,18 +273,40 @@ func (e *Engine) Pull(ctx context.Context) (*PullResult, error) {
 
 	var updated []string
 	toFetch := append(diff.Added, diff.Modified...)
-	for _, path := range toFetch {
-		entry := remoteTree.Entries[path]
-		blobBytes, err := e.Client.GetBlob(ctx, e.VaultID, entry.BlobHash)
-		if err != nil {
-			return nil, fmt.Errorf("sync: failed to get blob %s for %s: %w", entry.BlobHash, path, err)
-		}
 
-		plainBytes, err := vault.DecryptPayload(blobBytes, e.VaultKey)
+	// Download and decrypt in parallel (one round trip per blob is what makes
+	// a cold pull slow), then write only once every blob has arrived, so a
+	// failed download never leaves the bundle half-updated.
+	plain := make([][]byte, len(toFetch))
+	errs := make([]error, len(toFetch))
+	sem := make(chan struct{}, PullConcurrency)
+	var wg stdsync.WaitGroup
+	for i, path := range toFetch {
+		wg.Add(1)
+		sem <- struct{}{}
+		go func(i int, path string) {
+			defer wg.Done()
+			defer func() { <-sem }()
+			entry := remoteTree.Entries[path]
+			blobBytes, err := e.Client.GetBlob(ctx, e.VaultID, entry.BlobHash)
+			if err != nil {
+				errs[i] = fmt.Errorf("sync: failed to get blob %s for %s: %w", entry.BlobHash, path, err)
+				return
+			}
+			if plain[i], err = vault.DecryptPayload(blobBytes, e.VaultKey); err != nil {
+				errs[i] = fmt.Errorf("sync: failed to decrypt %s: %w", path, err)
+			}
+		}(i, path)
+	}
+	wg.Wait()
+	for _, err := range errs {
 		if err != nil {
-			return nil, fmt.Errorf("sync: failed to decrypt %s: %w", path, err)
+			return nil, err
 		}
+	}
 
+	for i, path := range toFetch {
+		plainBytes := plain[i]
 		fullPath := filepath.Join(e.BundlePath, filepath.FromSlash(path))
 		if err := os.MkdirAll(filepath.Dir(fullPath), 0o755); err != nil {
 			return nil, fmt.Errorf("sync: failed to mkdir for %s: %w", path, err)
