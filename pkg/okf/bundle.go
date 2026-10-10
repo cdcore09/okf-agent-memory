@@ -103,8 +103,17 @@ func ensureWithinRoot(rootDir, targetPath string) (string, error) {
 
 // LoadBundle loads all concepts, indexes, and logs from a bundle directory and builds the relationship graph.
 // A bundle root that is a symlink must resolve to a location inside the directory containing the link.
+// With the bundle cache enabled (see SetBundleCacheEnabled), a root that loaded
+// successfully is returned from the cache until InvalidateBundleCache.
 func LoadBundle(root string) (*Bundle, error) {
-	return loadBundle(root, false)
+	if b, ok := cachedBundle(root); ok {
+		return b, nil
+	}
+	b, err := loadBundle(root, false)
+	if err == nil {
+		storeBundle(root, b)
+	}
+	return b, err
 }
 
 // loadTrustedBundle loads a bundle whose root the user configured explicitly (user and system scope).
